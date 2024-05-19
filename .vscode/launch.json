@@ -1,0 +1,87 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Debug GRUB",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/grub/grub-core",
+            "program": "${workspaceFolder}/grub/grub-core/kernel.exec",  // Ensure this points to your compiled executable
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",  // Ensure this is the correct path to GDB
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing"
+                },
+                { 
+                    "description": "Enable pending breakpoints",
+                    "text": "set breakpoint pending on" // Keep breakpoints even if their module was not loaded on startup
+                },
+                {
+                    "description": "Load GDB Script",
+                    "text": "source gdb_grub"  // Ensure this points to your GDB script
+                }
+            ],
+            "launchCompleteCommand": "exec-continue",
+            "preLaunchTask": "debugGrub"  // Name of the task to run before debugging
+        },
+        {
+            "name": "Build and Debug GRUB",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/grub/grub-core",
+            "program": "${workspaceFolder}/grub/grub-core/kernel.exec",  // Ensure this points to your compiled executable
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",  // Ensure this is the correct path to GDB
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing"
+                },
+                { 
+                    "description": "Enable pending breakpoints",
+                    "text": "set breakpoint pending on" // Keep breakpoints even if their module was not loaded on startup
+                },
+                {
+                    "description": "Load GDB Script",
+                    "text": "source gdb_grub"  // Ensure this points to your GDB script
+                }
+            ],
+            "launchCompleteCommand": "exec-continue",
+            "preLaunchTask": "buildDebugGrub",
+            "postDebugTask": "kill-vnc"
+         
+        },
+        {
+            "name": "Config Build and Debug GRUB",
+            "type": "cppdbg",
+            "request": "launch",
+            "cwd": "${workspaceFolder}/grub/grub-core",
+            "program": "${workspaceFolder}/grub/grub-core/kernel.exec",  // Ensure this points to your compiled executable
+            "externalConsole": false,
+            "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",  // Ensure this is the correct path to GDB
+            "setupCommands": [
+                {
+                    "description": "Enable pretty-printing for gdb",
+                    "text": "-enable-pretty-printing"
+                },
+                { 
+                    "description": "Enable pending breakpoints",
+                    "text": "set breakpoint pending on" // Keep breakpoints even if their module was not loaded on startup
+                },
+                {
+                    "description": "Load GDB Script",
+                    "text": "source gdb_grub"  // Ensure this points to your GDB script
+                }
+            ],
+            "launchCompleteCommand": "exec-continue",
+            "preLaunchTask": "configBuildDebugGrub"  // Name of the task to run before debugging
+        },
+
+
+    ]
+}

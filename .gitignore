@@ -1,0 +1,6 @@
+# Grub folder
+grub/
+# pid files. used for debug monitoring
+*.pid
+*.img
+

@@ -1,0 +1,75 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "debugGrub",
+            "type": "shell",
+            "command": "./launch_grub_emu.sh",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "configBuildDebugGrub",
+            "type": "shell",
+            "command": "./grub/bootstrap && ./grub/configure && make -j30 && ./launch_grub_emu.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "buildDebugGrub",
+            "type": "shell",
+            "command": "make -C grub -j30 && ./launch_grub_emu.sh",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "presentation": {
+                "echo": true,
+                "reveal": "always",
+                "focus": false,
+                "panel": "shared",
+                "showReuseMessage": true,
+                "clear": false
+            },
+            "options": {
+                "cwd": "${workspaceFolder}"
+            }
+        },
+        {
+            "label": "start-vncviewer",
+            "type": "shell",
+            "command": "xtigervncviewer 127.0.0.1:5900",
+            "problemMatcher": []
+        },
+        {
+            "label": "kill-vnc",
+            "type": "shell",
+            "command": "./.end_debug.sh",
+            "problemMatcher": []
+        }
+
+    ],
+    "inputs": [
+        {
+            "id": "sudoPassword",
+            "type": "promptString",
+            "description": "Enter your sudo password",
+            "password": true
+        }
+    ]
+}
