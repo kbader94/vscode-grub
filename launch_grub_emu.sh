@@ -8,6 +8,7 @@ QEMU_OUTPUT="/tmp/qemu_output.txt"
 PWD_FILE_NAME=".pwd"
 QEMU_PID_FILE="$(dirname "$0")/qemu.pid"
 VNC_PID_FILE="$(dirname "$0")/vnc.pid"
+TIMEOUT="15"
 
 # Get sudo password
 current_dir=$(pwd)
@@ -129,7 +130,13 @@ echo $SUDO_PASSWORD | sudo -S umount $MOUNT_POINT
 echo $SUDO_PASSWORD | sudo -S losetup -d $LOOP_DEVICE
 
 # Launch QEMU and capture output using setsid
-nohup setsid qemu-system-i386 -drive file=$IMAGE,format=raw -device virtio-scsi-pci,id=scsi0 -S -s > "$QEMU_OUTPUT" 2>&1 &
+nohup setsid qemu-system-i386 \
+  -drive file=$IMAGE,format=raw \
+  -device virtio-scsi-pci,id=scsi0 \
+  -S -s \
+  -vnc :0 \
+  > "$QEMU_OUTPUT" 2>&1 &
+
 QEMU_PID=$!
 echo $QEMU_PID > "$QEMU_PID_FILE"
 echo "QEMU started with PID: $QEMU_PID"
@@ -137,22 +144,18 @@ echo "QEMU started with PID: $QEMU_PID"
 # Monitor QEMU output to detect when it is started or if an error occurs
 echo "Waiting for QEMU to start..."
 start_time=$(date +%s)
+echo "Waiting for QEMU VNC port to become active..."
 while true; do
-    if grep -q "127.0.0.1:5900" "$QEMU_OUTPUT"; then
-        echo "QEMU output contains '127.0.0.1:5900'."
+    if ss -tln | grep -q ":5900"; then
+        echo "QEMU VNC server is active on port 5900."
         break
-    fi
-
-    if [ -s "$QEMU_OUTPUT" ] && ! grep -q "127.0.0.1:5900" "$QEMU_OUTPUT"; then
-        echo "Error detected in QEMU output:"
-        cat "$QEMU_OUTPUT"
-        exit 9
     fi
 
     current_time=$(date +%s)
     elapsed_time=$((current_time - start_time))
-    if [ $elapsed_time -ge $TIMEOUT ]; then
-        echo "Error: QEMU did not start within $TIMEOUT seconds."
+    if [ "$elapsed_time" -ge "$TIMEOUT" ]; then
+        echo "Error: QEMU VNC server did not start within $TIMEOUT seconds."
+        cat "$QEMU_OUTPUT"
         exit 10
     fi
 
@@ -164,7 +167,6 @@ nohup setsid /usr/bin/xtigervncviewer 127.0.0.1:5900 > /tmp/vncviewer_output.log
 VNC_PID=$!
 # Write the PID to the .pid file
 echo $VNC_PID > "$VNC_PID_FILE"
-
 
 # Start the monitoring script in the background
 nohup "$(dirname "$0")/.monitor_debug_process.sh" "$VNC_PID" "$QEMU_PID" > /tmp/monitor_output.log 2>&1 &
